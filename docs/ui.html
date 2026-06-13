@@ -1,0 +1,1348 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IOT Studio</title>
+  <style>
+    :root {
+      --app-bg: #eef2f8;
+      --nav-bg: rgba(255, 255, 255, 0.78);
+      --nav-soft: #f5f8fc;
+      --nav-line: rgba(221, 229, 240, 0.9);
+      --surface: #ffffff;
+      --surface-soft: #f7f9fc;
+      --surface-raised: rgba(255, 255, 255, 0.86);
+      --line: #dde5f0;
+      --text: #172033;
+      --muted: #68758a;
+      --muted-2: #98a2b3;
+      --primary: #4f46e5;
+      --primary-2: #06b6d4;
+      --primary-soft: #eef2ff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 24px 70px rgba(16, 24, 40, 0.14);
+      --radius-xl: 24px;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --font-size: 14px;
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      font-size: var(--font-size);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 980px;
+      min-height: 680px;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(79, 70, 229, 0.16), transparent 34rem),
+        radial-gradient(circle at 88% 8%, rgba(6, 182, 212, 0.18), transparent 28rem),
+        linear-gradient(135deg, #f8fbff 0%, var(--app-bg) 58%, #e9edf5 100%);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 252px minmax(0, 1fr);
+      height: 100vh;
+      padding: 14px;
+      gap: 14px;
+    }
+
+    .sidebar {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 250, 254, 0.82)),
+        var(--nav-bg);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .brand {
+      padding: 18px;
+      border-bottom: 1px solid var(--nav-line);
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background:
+        radial-gradient(circle at 68% 30%, #ffffff 0 9%, transparent 10%),
+        linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 14px 30px rgba(79, 70, 229, 0.26);
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    .brand-mark::before {
+      width: 18px;
+      height: 3px;
+      transform: rotate(-32deg);
+    }
+
+    .brand-mark::after {
+      width: 3px;
+      height: 18px;
+      transform: rotate(-32deg);
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 1.12rem;
+      letter-spacing: -0.04em;
+    }
+
+    .settings-button {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.72);
+      cursor: pointer;
+      transition: 160ms ease;
+    }
+
+    .settings-button:hover {
+      color: var(--primary);
+      border-color: rgba(79, 70, 229, 0.3);
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .settings-button svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .nav-section {
+      min-height: 0;
+      overflow: auto;
+      padding: 14px;
+    }
+
+    .side-controls {
+      display: grid;
+      gap: 9px;
+      margin: 0 0 14px;
+    }
+
+    .device-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .device-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 13px;
+      background: rgba(255, 255, 255, 0.72);
+      cursor: pointer;
+      transition: 180ms ease;
+    }
+
+    .device-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      opacity: 0;
+      background: linear-gradient(180deg, var(--primary), var(--primary-2));
+      transition: 180ms ease;
+    }
+
+    .device-card:hover,
+    .device-card.active {
+      border-color: rgba(79, 70, 229, 0.36);
+      background: #ffffff;
+      box-shadow: 0 12px 28px rgba(16, 24, 40, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .device-card.active::before {
+      opacity: 1;
+    }
+
+    .device-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .port {
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .device-meta {
+      display: grid;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      overflow-wrap: anywhere;
+    }
+
+    .sidebar-footer {
+      padding: 14px;
+      border-top: 1px solid var(--nav-line);
+    }
+
+    .mini-status {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--nav-soft);
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      display: inline-block;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.12);
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: var(--radius-xl);
+      background: var(--surface-raised);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .control,
+    .input,
+    .select {
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      padding: 0 11px;
+    }
+
+    .control {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 160ms ease;
+    }
+
+    .control:hover {
+      border-color: #c8d2e1;
+      background: var(--surface-soft);
+      transform: translateY(-1px);
+    }
+
+    .control.primary {
+      border-color: transparent;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      box-shadow: 0 13px 28px rgba(79, 70, 229, 0.26);
+    }
+
+    .control.danger {
+      border-color: transparent;
+      color: #ffffff;
+      background: var(--danger);
+    }
+
+    .control:disabled {
+      opacity: 0.56;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .content {
+      min-height: 0;
+      overflow: hidden;
+      padding: 18px 20px 20px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 16px;
+      align-items: stretch;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+      min-height: 0;
+    }
+
+    .config-stack {
+      grid-template-rows: minmax(0, 1fr);
+    }
+
+    .card {
+      border: 1px solid rgba(221, 229, 240, 0.92);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 12px 34px rgba(16, 24, 40, 0.06);
+      overflow: hidden;
+    }
+
+    .config-card {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 17px 0;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .card-body {
+      padding: 16px 17px 17px;
+    }
+
+    .config-body {
+      min-height: 0;
+    }
+
+    #configForm {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .form-section {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 14px;
+      min-height: 0;
+    }
+
+    .config-tabs {
+      display: inline-flex;
+      gap: 6px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface-soft);
+      width: fit-content;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .tab-button {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 12px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: 760;
+      transition: 160ms ease;
+    }
+
+    .tab-button:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .tab-button.active {
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      box-shadow: 0 10px 22px rgba(79, 70, 229, 0.22);
+    }
+
+    .tab-panel {
+      display: none;
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: linear-gradient(180deg, #ffffff, #fbfcff);
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 2px;
+      color: #334155;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: #334155;
+      font-size: 0.88rem;
+      font-weight: 760;
+    }
+
+    .field small {
+      color: var(--muted-2);
+      font-weight: 650;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: rgba(79, 70, 229, 0.68);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+    }
+
+    .input:disabled,
+    .select:disabled {
+      color: var(--muted-2);
+      background: #f3f6fa;
+      cursor: not-allowed;
+    }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      margin-top: 0;
+      padding-top: 15px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 25px;
+      padding: 0 9px;
+      border-radius: 999px;
+      color: #047857;
+      background: #e8fff5;
+      font-size: 0.78rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge.warn {
+      color: #9a6700;
+      background: #fff7dc;
+    }
+
+    .badge.neutral {
+      color: #475467;
+      background: #f2f4f7;
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 9px;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 10px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.9rem;
+    }
+
+    .info-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .info-row span {
+      color: var(--muted);
+    }
+
+    .info-row strong {
+      overflow-wrap: anywhere;
+    }
+
+    .code {
+      margin: 0;
+      max-height: 280px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      color: #243247;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 249, 252, 0.92)),
+        #ffffff;
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.65;
+    }
+
+    .empty {
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      text-align: center;
+    }
+
+    .statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 38px;
+      padding: 0 20px;
+      border-top: 1px solid rgba(221, 229, 240, 0.78);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.5);
+      font-size: 0.86rem;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.58);
+      backdrop-filter: blur(6px);
+      z-index: 20;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(760px, 100%);
+      max-height: min(720px, calc(100vh - 48px));
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.74);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: 0 34px 100px rgba(15, 23, 42, 0.34);
+    }
+
+    .modal-head {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 1.18rem;
+      letter-spacing: -0.03em;
+    }
+
+    .modal-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .diff-list {
+      display: grid;
+      gap: 9px;
+      overflow: auto;
+      padding: 16px 22px;
+    }
+
+    .diff {
+      display: grid;
+      grid-template-columns: 148px minmax(0, 1fr);
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: var(--surface-soft);
+    }
+
+    .diff-name {
+      font-weight: 820;
+    }
+
+    .diff-value {
+      display: grid;
+      gap: 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .old {
+      color: var(--muted);
+    }
+
+    .new {
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 22px 20px;
+      border-top: 1px solid var(--line);
+      background: var(--surface-soft);
+    }
+
+    .about-dialog {
+      width: min(760px, 100%);
+      min-height: 420px;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.74);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: 0 34px 100px rgba(15, 23, 42, 0.34);
+    }
+
+    .about-side {
+      display: grid;
+      align-content: space-between;
+      gap: 28px;
+      padding: 24px;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2), transparent 12rem),
+        linear-gradient(150deg, #4f46e5, #2563eb 54%, #06b6d4);
+    }
+
+    .about-logo {
+      width: 52px;
+      height: 52px;
+      position: relative;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.18);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+    }
+
+    .about-logo::before,
+    .about-logo::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 999px;
+      background: #ffffff;
+      transform: translate(-50%, -50%) rotate(-32deg);
+    }
+
+    .about-logo::before {
+      width: 24px;
+      height: 4px;
+    }
+
+    .about-logo::after {
+      width: 4px;
+      height: 24px;
+    }
+
+    .about-side h2 {
+      margin: 14px 0 6px;
+      font-size: 1.4rem;
+      letter-spacing: -0.04em;
+    }
+
+    .about-side p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .version-card {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+    }
+
+    .version-card span {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.82rem;
+    }
+
+    .version-card strong {
+      font-size: 1.05rem;
+    }
+
+    .about-main {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-width: 0;
+    }
+
+    .about-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 22px 24px 12px;
+    }
+
+    .about-head h3 {
+      margin: 0;
+      font-size: 1.08rem;
+      letter-spacing: -0.02em;
+    }
+
+    .about-head p {
+      margin: 5px 0 0;
+      color: var(--muted);
+    }
+
+    .about-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      cursor: pointer;
+    }
+
+    .about-content {
+      display: grid;
+      gap: 10px;
+      padding: 10px 24px 20px;
+    }
+
+    .about-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .about-row span {
+      color: var(--muted);
+    }
+
+    .about-row strong {
+      overflow-wrap: anywhere;
+    }
+
+    .about-footer {
+      padding: 14px 24px 22px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 1260px) {
+      body { min-width: 860px; }
+      .dashboard { grid-template-columns: 1fr; }
+      .side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); display: grid; }
+    }
+
+    @media (max-width: 920px) {
+      body { min-width: 0; }
+      .app {
+        display: block;
+        height: auto;
+        min-height: 100vh;
+        padding: 10px;
+      }
+      .sidebar { margin-bottom: 10px; }
+      .nav-section { max-height: 320px; }
+      .form-grid,
+      .side-stack { grid-template-columns: 1fr; }
+      .main { min-height: 720px; }
+      .modal-actions,
+      .form-actions { flex-direction: column; }
+      .control { width: 100%; }
+      .diff { grid-template-columns: 1fr; }
+      .about-dialog { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-row">
+          <div class="brand-identity">
+            <div class="brand-mark" aria-hidden="true"></div>
+            <div>
+              <strong>IOT Studio</strong>
+            </div>
+          </div>
+          <button class="settings-button" id="settingsBtn" type="button" aria-label="软件信息">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="6" cy="12" r="1.8" fill="currentColor"/>
+              <circle cx="12" cy="12" r="1.8" fill="currentColor"/>
+              <circle cx="18" cy="12" r="1.8" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="side-controls">
+          <button class="control primary" id="scanBtn" type="button" data-i18n="scan">Scan Ports</button>
+        </div>
+        <div class="device-list" id="deviceList"></div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="mini-status">
+          <div><span data-i18n="detected">Detected</span>: <strong id="deviceCount">0</strong></div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="main">
+      <main class="content">
+        <div class="dashboard">
+          <div class="stack config-stack">
+            <section class="card config-card">
+              <div class="card-head">
+                <div>
+                  <h2 data-i18n="configTitle">Configuration</h2>
+                  <p data-i18n="configDesc">Changes are reviewed before being written to NVS.</p>
+                </div>
+                <button class="control" id="readConfigBtn" type="button" data-i18n="readCurrent">Read Current</button>
+              </div>
+              <div class="card-body config-body">
+                <form id="configForm">
+                  <div class="form-section">
+                    <div class="config-tabs" role="tablist" aria-label="Configuration sections">
+                      <button class="tab-button active" type="button" data-tab="identity">基础信息</button>
+                      <button class="tab-button" type="button" data-tab="wifi">Wi-Fi 配置</button>
+                      <button class="tab-button" type="button" data-tab="mqtt">MQTT 配置</button>
+                      <button class="tab-button" type="button" data-tab="espnow">ESP-NOW</button>
+                    </div>
+
+                    <section class="tab-panel active" data-panel="identity">
+                      <div class="section-title" data-i18n="identity">Identity</div>
+                      <div class="form-grid">
+                        <div class="field">
+                          <label for="deviceId"><span data-i18n="deviceId">Device ID</span><small>required</small></label>
+                          <input class="input" id="deviceId" name="device_id">
+                        </div>
+                        <div class="field">
+                          <label for="role"><span data-i18n="role">Role</span></label>
+                          <select class="select" id="role" name="device_role">
+                            <option value="gateway" data-i18n="roleGateway">Gateway</option>
+                            <option value="node" data-i18n="roleNode">Node</option>
+                          </select>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="tab-panel" data-panel="wifi">
+                      <div class="section-title" data-i18n="network">Network</div>
+                      <div class="form-grid">
+                        <div class="field">
+                          <label for="wifiSsid"><span>Wi-Fi SSID</span><small>2.4GHz</small></label>
+                          <input class="input" id="wifiSsid" name="wifi_ssid">
+                        </div>
+                        <div class="field">
+                          <label for="wifiPassword"><span data-i18n="wifiPassword">Wi-Fi Password</span></label>
+                          <input class="input" id="wifiPassword" name="wifi_password" type="password">
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="tab-panel" data-panel="mqtt">
+                      <div class="section-title">MQTT</div>
+                      <div class="form-grid">
+                        <div class="field">
+                          <label for="mqttHost"><span>MQTT Host</span></label>
+                          <input class="input" id="mqttHost" name="mqtt_host">
+                        </div>
+                        <div class="field">
+                          <label for="mqttPort"><span data-i18n="mqttPort">MQTT Port</span></label>
+                          <input class="input" id="mqttPort" name="mqtt_port" type="number" min="1" max="65535">
+                        </div>
+                        <div class="field">
+                          <label for="mqttUser"><span data-i18n="mqttUser">MQTT User</span></label>
+                          <input class="input" id="mqttUser" name="mqtt_user">
+                        </div>
+                        <div class="field">
+                          <label for="mqttPassword"><span data-i18n="mqttPassword">MQTT Password</span></label>
+                          <input class="input" id="mqttPassword" name="mqtt_password" type="password">
+                        </div>
+                        <div class="field full">
+                          <label for="topicPrefix"><span data-i18n="topicPrefix">Topic Prefix</span></label>
+                          <input class="input" id="topicPrefix" name="mqtt_topic_prefix">
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="tab-panel" data-panel="espnow">
+                      <div class="section-title" data-i18n="espnow">ESP-NOW</div>
+                      <div class="form-grid">
+                        <div class="field">
+                          <label for="channelMode"><span data-i18n="channelMode">Channel Mode</span></label>
+                          <select class="select" id="channelMode" name="espnow_channel_mode">
+                            <option value="auto" data-i18n="channelAuto">Auto follow Wi-Fi</option>
+                            <option value="fixed" data-i18n="channelFixed">Fixed channel</option>
+                          </select>
+                        </div>
+                        <div class="field">
+                          <label for="fixedChannel"><span data-i18n="fixedChannel">Fixed Channel</span><small>1-13</small></label>
+                          <input class="input" id="fixedChannel" name="espnow_fixed_channel" type="number" min="1" max="13">
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  <div class="form-actions">
+                    <button class="control" id="resetBtn" type="button" data-i18n="restore">Restore</button>
+                    <button class="control primary" id="previewConfirmBtn" type="submit" data-i18n="previewConfirm">Preview & Confirm</button>
+                  </div>
+                </form>
+              </div>
+            </section>
+          </div>
+
+          <aside class="stack side-stack">
+            <section class="card">
+              <div class="card-head">
+                <div>
+                  <h2 data-i18n="hardware">Hardware</h2>
+                  <p data-i18n="hardwareDesc">Returned by the hello command.</p>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="info-grid" id="hardwareInfo"></div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-head">
+                <div>
+                  <h2 data-i18n="currentConfig">Current Config</h2>
+                  <p>NVS / JSON</p>
+                </div>
+              </div>
+              <div class="card-body">
+                <pre class="code" id="configPreview">Select a device.</pre>
+              </div>
+            </section>
+
+          </aside>
+        </div>
+      </main>
+
+      <footer class="statusbar">
+        <span id="statusText">Ready</span>
+        <span>配置写入前会展示变更项并要求确认</span>
+      </footer>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="confirmModal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 data-i18n="confirmTitle">Confirm Configuration Write</h2>
+        <p data-i18n="confirmDesc">The device will save this configuration to NVS and restart.</p>
+      </div>
+      <div class="diff-list" id="diffList"></div>
+      <div class="modal-actions">
+        <button class="control" id="cancelConfirmBtn" type="button" data-i18n="cancel">Cancel</button>
+        <button class="control danger" id="confirmWriteBtn" type="button" data-i18n="confirmWrite">Write & Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <div class="about-dialog">
+      <aside class="about-side">
+        <div>
+          <div class="about-logo" aria-hidden="true"></div>
+          <h2>IOT Studio</h2>
+          <p>ESP32-C3 配置工具</p>
+        </div>
+        <div class="version-card">
+          <span>当前软件版本</span>
+          <strong>v0.1.0</strong>
+          <span>UI Prototype</span>
+        </div>
+      </aside>
+      <section class="about-main">
+        <div class="about-head">
+          <div>
+            <h3 id="aboutTitle">关于软件</h3>
+            <p>用于扫描串口设备、读取硬件信息并写入网关配置。</p>
+          </div>
+          <button class="about-close" id="aboutCloseBtn" type="button" aria-label="关闭">×</button>
+        </div>
+        <div class="about-content">
+          <div class="about-row"><span>应用名称</span><strong>IOT Studio</strong></div>
+          <div class="about-row"><span>软件版本</span><strong>v0.1.0</strong></div>
+          <div class="about-row"><span>构建类型</span><strong>Desktop UI Prototype</strong></div>
+          <div class="about-row"><span>目标平台</span><strong>Windows / macOS / Linux</strong></div>
+          <div class="about-row"><span>通信方式</span><strong>USB Serial / JSON Lines</strong></div>
+          <div class="about-row"><span>配置存储</span><strong>ESP32 NVS</strong></div>
+        </div>
+        <div class="about-footer">后续接入 Wails 后，可在这里展示真实版本号、构建时间和 Git Commit。</div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const i18n = {
+      zh: {
+        detected: '已发现', scan: '扫描串口', port: '串口', firmware: '固件', status: '状态', configTitle: '配置', configDesc: '所有变更会先预览，再写入 NVS。', readCurrent: '读取当前', identity: '身份', deviceId: '设备 ID', role: '设备角色', roleGateway: '主节点 / 网关', roleNode: '从节点 / 采集节点', network: '网络', wifiPassword: 'Wi-Fi 密码', mqttPort: 'MQTT 端口', mqttUser: 'MQTT 用户名', mqttPassword: 'MQTT 密码', topicPrefix: 'Topic 前缀', espnow: 'ESP-NOW', channelMode: '信道模式', channelAuto: '自动跟随 Wi-Fi', channelFixed: '固定信道', fixedChannel: '固定信道', restore: '恢复', previewConfirm: '预览并确认', hardware: '硬件信息', hardwareDesc: '由 hello 命令返回。', currentConfig: '当前配置', confirmTitle: '确认写入配置', confirmDesc: '设备会将配置保存到 NVS，并重启生效。', cancel: '取消', confirmWrite: '写入并重启', configured: '已配置', unconfigured: '待配置', selected: '已选择', selectDevice: '请选择设备', scanDone: '扫描完成，发现 2 台设备。', readDone: '已读取当前配置。', restored: '表单已恢复为当前配置。', writeDone: '配置已写入，设备将重启。', noChanges: '没有变更，无需写入。', old: '当前', next: '更新', ready: '就绪'
+      },
+      en: {
+        detected: 'Detected', scan: 'Scan Ports', port: 'Port', firmware: 'Firmware', status: 'Status', configTitle: 'Configuration', configDesc: 'Changes are reviewed before being written to NVS.', readCurrent: 'Read Current', identity: 'Identity', deviceId: 'Device ID', role: 'Role', roleGateway: 'Gateway', roleNode: 'Node', network: 'Network', wifiPassword: 'Wi-Fi Password', mqttPort: 'MQTT Port', mqttUser: 'MQTT User', mqttPassword: 'MQTT Password', topicPrefix: 'Topic Prefix', espnow: 'ESP-NOW', channelMode: 'Channel Mode', channelAuto: 'Auto follow Wi-Fi', channelFixed: 'Fixed channel', fixedChannel: 'Fixed Channel', restore: 'Restore', previewConfirm: 'Preview & Confirm', hardware: 'Hardware', hardwareDesc: 'Returned by the hello command.', currentConfig: 'Current Config', confirmTitle: 'Confirm Configuration Write', confirmDesc: 'The device will save this configuration to NVS and restart.', cancel: 'Cancel', confirmWrite: 'Write & Restart', configured: 'Configured', unconfigured: 'Pending', selected: 'Selected', selectDevice: 'Select a device', scanDone: 'Scan complete. 2 devices found.', readDone: 'Current configuration loaded.', restored: 'Form restored from current configuration.', writeDone: 'Configuration written. Device will restart.', noChanges: 'No changes to write.', old: 'Current', next: 'New', ready: 'Ready'
+      }
+    };
+
+    const devices = [
+      {
+        port: 'COM5', type: 'esp32c3_gateway', chip: 'ESP32-C3', usb: 'USB CDC', mac: 'A0:B7:65:12:34:56', firmware: '1.0.0', flash: '4MB', configured: true,
+        config: { device_id: 'gateway_living_room', device_role: 'gateway', wifi_ssid: 'HomeWiFi', wifi_password: '********', mqtt_host: '192.168.1.10', mqtt_port: 1883, mqtt_user: 'iot', mqtt_password: '********', mqtt_topic_prefix: 'home/living_room', espnow_channel_mode: 'auto', espnow_fixed_channel: 6 }
+      },
+      {
+        port: 'COM8', type: 'esp32c3_gateway', chip: 'ESP32-C3', usb: 'CH343', mac: '34:85:18:8B:92:01', firmware: '1.0.0', flash: '4MB', configured: false,
+        config: { device_id: '', device_role: 'gateway', wifi_ssid: '', wifi_password: '', mqtt_host: '', mqtt_port: 1883, mqtt_user: '', mqtt_password: '', mqtt_topic_prefix: '', espnow_channel_mode: 'auto', espnow_fixed_channel: 6 }
+      }
+    ];
+
+    const labels = {
+      device_id: { zh: '设备 ID', en: 'Device ID' }, device_role: { zh: '设备角色', en: 'Role' }, wifi_ssid: { zh: 'Wi-Fi SSID', en: 'Wi-Fi SSID' }, wifi_password: { zh: 'Wi-Fi 密码', en: 'Wi-Fi Password' }, mqtt_host: { zh: 'MQTT Host', en: 'MQTT Host' }, mqtt_port: { zh: 'MQTT 端口', en: 'MQTT Port' }, mqtt_user: { zh: 'MQTT 用户名', en: 'MQTT User' }, mqtt_password: { zh: 'MQTT 密码', en: 'MQTT Password' }, mqtt_topic_prefix: { zh: 'Topic 前缀', en: 'Topic Prefix' }, espnow_channel_mode: { zh: 'ESP-NOW 信道', en: 'ESP-NOW Channel' }, espnow_fixed_channel: { zh: '固定信道', en: 'Fixed Channel' }
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const fields = {
+      device_id: $('deviceId'), device_role: $('role'), wifi_ssid: $('wifiSsid'), wifi_password: $('wifiPassword'), mqtt_host: $('mqttHost'), mqtt_port: $('mqttPort'), mqtt_user: $('mqttUser'), mqtt_password: $('mqttPassword'), mqtt_topic_prefix: $('topicPrefix'), espnow_channel_mode: $('channelMode'), espnow_fixed_channel: $('fixedChannel')
+    };
+
+    let lang = 'zh';
+    let scanned = false;
+    let selected = null;
+    let pending = null;
+
+    function t(key) {
+      return i18n[lang][key] || key;
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      document.querySelectorAll('[data-i18n]').forEach((node) => {
+        node.textContent = t(node.dataset.i18n);
+      });
+      renderDevices();
+      renderSelected();
+      $('statusText').textContent = t('ready');
+    }
+
+    function setStatus(text) {
+      $('statusText').textContent = text;
+    }
+
+    function mask(key, value) {
+      if (key.includes('password') && value) return '********';
+      return value === '' || value === undefined || value === null ? '-' : String(value);
+    }
+
+    function renderDevices() {
+      const list = scanned ? devices : [];
+      $('deviceCount').textContent = String(list.length);
+
+      if (!scanned) {
+        $('deviceList').innerHTML = '';
+        return;
+      }
+
+      $('deviceList').innerHTML = list.map((device) => `
+        <article class="device-card ${selected && selected.port === device.port ? 'active' : ''}" data-port="${device.port}">
+          <div class="device-head">
+            <span class="port">${device.port}</span>
+            <span class="badge ${device.configured ? '' : 'warn'}">${device.configured ? t('configured') : t('unconfigured')}</span>
+          </div>
+          <div class="device-meta">
+            <span>${device.chip} · ${device.usb}</span>
+            <span>${device.mac}</span>
+            <span>${device.config.device_id || '-'}</span>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderSelected() {
+      Object.values(fields).forEach((input) => {
+        input.disabled = !selected;
+      });
+      $('resetBtn').disabled = !selected;
+      $('previewConfirmBtn').disabled = !selected;
+
+      if (!selected) {
+        $('hardwareInfo').innerHTML = `<div class="empty">${t('selectDevice')}</div>`;
+        $('configPreview').textContent = t('selectDevice');
+        return;
+      }
+
+      const rows = [
+        [t('port'), selected.port], ['Type', selected.type], ['Chip', selected.chip], ['USB', selected.usb], ['MAC', selected.mac], ['Flash', selected.flash], [t('firmware'), selected.firmware], [t('status'), selected.configured ? t('configured') : t('unconfigured')]
+      ];
+
+      $('hardwareInfo').innerHTML = rows.map(([name, value]) => `<div class="info-row"><span>${name}</span><strong>${value}</strong></div>`).join('');
+      $('configPreview').textContent = JSON.stringify(selected.config, null, 2);
+    }
+
+    function fillForm(config) {
+      Object.entries(fields).forEach(([key, input]) => {
+        input.value = config[key] ?? '';
+      });
+    }
+
+    function readForm() {
+      const config = {};
+      Object.entries(fields).forEach(([key, input]) => {
+        config[key] = input.type === 'number' ? Number(input.value || 0) : input.value.trim();
+      });
+      return config;
+    }
+
+    function diffConfig(current, next) {
+      return Object.keys(labels).filter((key) => String(current[key] ?? '') !== String(next[key] ?? '')).map((key) => ({
+        key,
+        label: labels[key][lang],
+        oldValue: mask(key, current[key]),
+        newValue: mask(key, next[key])
+      }));
+    }
+
+    function openConfirm(diff) {
+      $('confirmWriteBtn').disabled = diff.length === 0;
+      $('diffList').innerHTML = diff.length ? diff.map((item) => `
+        <div class="diff">
+          <div class="diff-name">${item.label}</div>
+          <div class="diff-value">
+            <span class="old">${t('old')}: ${item.oldValue}</span>
+            <span class="new">${t('next')}: ${item.newValue}</span>
+          </div>
+        </div>
+      `).join('') : `<div class="empty">${t('noChanges')}</div>`;
+      $('confirmModal').classList.add('show');
+    }
+
+    function closeConfirm() {
+      pending = null;
+      $('confirmModal').classList.remove('show');
+    }
+
+    function openAbout() {
+      $('aboutModal').classList.add('show');
+    }
+
+    function closeAbout() {
+      $('aboutModal').classList.remove('show');
+    }
+
+    document.querySelectorAll('.tab-button').forEach((button) => {
+      button.addEventListener('click', () => {
+        const tab = button.dataset.tab;
+        document.querySelectorAll('.tab-button').forEach((item) => item.classList.toggle('active', item === button));
+        document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab));
+      });
+    });
+
+    $('scanBtn').addEventListener('click', () => {
+      scanned = true;
+      selected = devices[0];
+      fillForm(selected.config);
+      renderDevices();
+      renderSelected();
+      setStatus(t('scanDone'));
+    });
+
+    $('deviceList').addEventListener('click', (event) => {
+      const card = event.target.closest('.device-card');
+      if (!card) return;
+      selected = devices.find((device) => device.port === card.dataset.port);
+      fillForm(selected.config);
+      renderDevices();
+      renderSelected();
+      setStatus(`${t('selected')}: ${selected.port}`);
+    });
+
+    $('readConfigBtn').addEventListener('click', () => {
+      if (!selected) {
+        setStatus(t('selectDevice'));
+        return;
+      }
+      fillForm(selected.config);
+      renderSelected();
+      setStatus(`${selected.port}: ${t('readDone')}`);
+    });
+
+    $('resetBtn').addEventListener('click', () => {
+      if (!selected) {
+        setStatus(t('selectDevice'));
+        return;
+      }
+      fillForm(selected.config);
+      setStatus(t('restored'));
+    });
+
+    $('configForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!selected) {
+        setStatus(t('selectDevice'));
+        return;
+      }
+      pending = readForm();
+      openConfirm(diffConfig(selected.config, pending));
+    });
+
+    $('cancelConfirmBtn').addEventListener('click', closeConfirm);
+
+    $('settingsBtn').addEventListener('click', openAbout);
+    $('aboutCloseBtn').addEventListener('click', closeAbout);
+
+    $('confirmWriteBtn').addEventListener('click', () => {
+      if (!selected || !pending) {
+        closeConfirm();
+        return;
+      }
+      selected.config = { ...pending };
+      selected.configured = true;
+      renderDevices();
+      renderSelected();
+      setStatus(t('writeDone'));
+      closeConfirm();
+    });
+
+    $('confirmModal').addEventListener('click', (event) => {
+      if (event.target === $('confirmModal')) closeConfirm();
+    });
+
+    $('aboutModal').addEventListener('click', (event) => {
+      if (event.target === $('aboutModal')) closeAbout();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeConfirm();
+        closeAbout();
+      }
+    });
+
+    applyLanguage();
+    setStatus(t('ready'));
+  </script>
+</body>
+</html>
